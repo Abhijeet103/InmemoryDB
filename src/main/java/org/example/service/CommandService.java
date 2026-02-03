@@ -4,13 +4,15 @@ import org.example.exception.InvalidCommandException;
 import org.example.entity.Command;
 import org.example.entity.CommandType;
 
+
+
 public class CommandService {
 
     Command parse(String command) {
 
         String[] arr = command.split(" ");
         CommandType type = CommandType.valueOf(arr[0].toUpperCase());
-        Command cmd = new Command() ;
+        Command cmd = new Command();
         cmd.type = type ;
 
 
@@ -19,6 +21,8 @@ public class CommandService {
             break;
             case GET , DELETE : parseKey(arr , cmd);
             break;
+            case START , STOP  , EXIT:
+                break ;
             default:
                 throw new InvalidCommandException("Unknown command type");
 
