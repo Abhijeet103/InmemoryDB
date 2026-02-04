@@ -10,12 +10,46 @@ public class DbService  implements IDbservice{
     private final HashMap<Integer , Entry<Object>> data ;
     volatile private boolean state  ;
 
+    final private int cleaupTime = 1000 ;
+
 
     public DbService() {
 
         data = new HashMap<>();
         state = true;
+        backGroundTask();
     }
+
+    synchronized private void cleanUp(){
+        data.entrySet().removeIf(entry -> entry.getValue().isExpired());
+    }
+
+
+    private  void backGroundTask(){
+
+        System.out.println("Background clear started");
+
+        Thread thread = new Thread(()->{
+
+            while(true){
+
+                try {
+                    cleanUp() ;
+                    Thread.sleep(cleaupTime);
+
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        }) ;
+
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+
+
 
 
     @Override
@@ -63,8 +97,12 @@ public class DbService  implements IDbservice{
         }
     }
 
-    public void setState(boolean state){
-        this.state = state ;
+    public void start(){
+        this.state = true ;
+    }
+
+    public void stop(){
+        this.state = false ;
     }
 
 

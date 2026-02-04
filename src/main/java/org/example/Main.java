@@ -7,6 +7,7 @@ import org.example.exception.InvalidCommandException;
 import org.example.exception.InvalidKeyException;
 import org.example.service.CommandService;
 import org.example.service.DbService;
+import org.example.service.IDbservice;
 
 import java.util.Scanner;
 
@@ -14,7 +15,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        DbService dbService = new DbService();
+        IDbservice dbService = new DbService();
         CommandService commandService = new CommandService();
 
         String[] commands = {
