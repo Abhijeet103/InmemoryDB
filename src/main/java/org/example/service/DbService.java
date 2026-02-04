@@ -1,43 +1,52 @@
 package org.example.service;
 
 import org.example.entity.Entry;
+import org.example.exception.DbUnavaiableException;
 import org.example.exception.InvalidKeyException;
 
 import java.util.HashMap;
 
-public class DbService<T>  implements IDbservice{
-    private HashMap<Integer , Entry<T>> data ;
+public class DbService  implements IDbservice{
+    private final HashMap<Integer , Entry<Object>> data ;
+    volatile private boolean state  ;
+
+
     public DbService() {
 
         data = new HashMap<>();
+        state = true;
     }
 
 
     @Override
-    public void put(Integer key, Object data , long ttl) {
+    synchronized public void put(Integer key, Object data , long ttl) {
 
-        Entry<T> ob = new Entry<>((T)data , ttl)  ;
+        if(!state){
+            throw new DbUnavaiableException("Unable to connect to Db") ;
+        }
+
+        Entry<Object> ob = new Entry<>(data , ttl)  ;
         this.data.put(key , ob) ;
     }
 
     @Override
-    public void put(Integer key, Object data) {
+    synchronized public  void put(Integer key, Object data) {
 
-        Entry<T> ob = new Entry<>((T)data)  ;
+        Entry<Object> ob = new Entry<>(data)  ;
         this.data.put(key , ob) ;
     }
 
 
     // Lazy delete
     @Override
-    public T get(Integer key) {
+    synchronized public  Object get(Integer key) {
 
         if(data.containsKey(key)){
             if(data.get(key).isExpired()){
                 data.remove(key)  ;
                 throw new InvalidKeyException("Key not found or expired");
             }
-           return (T) data.get(key).data ;
+           return data.get(key).data ;
         }
         else {
             throw new InvalidKeyException("Key not found");
@@ -45,7 +54,7 @@ public class DbService<T>  implements IDbservice{
     }
 
     @Override
-    public void delete(Integer key) {
+    synchronized public  void delete(Integer key) {
         if(data.containsKey(key)){
             data.remove(key) ;
         }
@@ -53,4 +62,10 @@ public class DbService<T>  implements IDbservice{
             throw new InvalidKeyException("Key not found");
         }
     }
+
+    public void setState(boolean state){
+        this.state = state ;
+    }
+
+
 }

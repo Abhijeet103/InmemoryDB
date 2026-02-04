@@ -8,7 +8,7 @@ import org.example.entity.CommandType;
 
 public class CommandService {
 
-    Command parse(String command) {
+    public Command parse(String command) {
 
         String[] arr = command.split(" ");
         CommandType type = CommandType.valueOf(arr[0].toUpperCase());
