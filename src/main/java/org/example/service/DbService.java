@@ -15,13 +15,28 @@ public class DbService<T>  implements IDbservice{
 
     @Override
     public void put(Integer key, Object data , long ttl) {
+
         Entry<T> ob = new Entry<>((T)data , ttl)  ;
         this.data.put(key , ob) ;
     }
 
     @Override
+    public void put(Integer key, Object data) {
+
+        Entry<T> ob = new Entry<>((T)data)  ;
+        this.data.put(key , ob) ;
+    }
+
+
+    // Lazy delete
+    @Override
     public T get(Integer key) {
+
         if(data.containsKey(key)){
+            if(data.get(key).isExpired()){
+                data.remove(key)  ;
+                throw new InvalidKeyException("Key not found or expired");
+            }
            return (T) data.get(key).data ;
         }
         else {
