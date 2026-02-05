@@ -73,6 +73,7 @@ public class Main {
 
                     case SHOW :
                         dbService.showDB();
+                        break ;
 
                     default:
                         System.out.println("Unknown command");
